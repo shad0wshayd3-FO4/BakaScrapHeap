@@ -1,6 +1,3 @@
-#include "Utils.h"
-
-
 extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a_F4SE, F4SE::PluginInfo* a_info)
 {
 	// Create log
@@ -10,7 +7,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 		return false;
 	}
 
-	*logPath /= Plugin::LOG;
+	*logPath /= "BakaScrapHeap.log"sv;
 	auto logSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath->string(), true);
 	auto log = std::make_shared<spdlog::logger>("plugin_log"s, std::move(logSink));
 
@@ -20,25 +17,24 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	spdlog::flush_on(spdlog::level::debug);
 
 	// Set log level from ini
-	INIReader Reader(Plugin::CONFIG);
-	switch (Reader.GetInteger("General"s, "bEnableDebugLogging"s, 0))
+	Settings::Load();
+	if (*Settings::EnableDebugLogging)
 	{
-	case 1:
 		spdlog::set_level(spdlog::level::debug);
-		break;
-	default:
+	}
+	else
+	{
 		spdlog::set_level(spdlog::level::info);
-		break;
 	}
 
 	// Initial messages
-	logger::info("{} log opened."sv, Plugin::NAME);
+	logger::info("{} log opened."sv, "BakaScrapHeap"sv);
 	logger::debug("Debug logging enabled."sv);
 
 	// Initialize PluginInfo
 	a_info->infoVersion = F4SE::PluginInfo::kVersion;
-	a_info->name = Plugin::NAME;
-	a_info->version = Plugin::VERSION;
+	a_info->name = "BakaScrapHeap";
+	a_info->version = Version::MAJOR;
 
 	// Check if we're being loaded in the CK.
 	if (a_F4SE->IsEditor())
@@ -65,11 +61,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 
 	// Patch ScrapHeap
 	static auto GetScrapHeapMaxSize = REL::ID(126418);
-	
-	auto Reader = INIReader(Plugin::CONFIG);
-	auto iScrapHeapMult = Reader.GetInteger("General", "iScrapHeapMult", 2);
-
-	switch (iScrapHeapMult)
+	switch (*Settings::ScrapHeapMult)
 	{
 	case 1:
 		logger::info("Leaving ScrapHeap unpatched at 0x04000000 (~70mb)."sv);
@@ -87,7 +79,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 		logger::info("Patching ScrapHeap to 0x0FF00000 (~270mb)."sv);
 		break;
 	default:
-		logger::warn("iScrapHeapMult invalid: value must be between 1 and 4, is {}."sv, iScrapHeapMult);
+		logger::warn("iScrapHeapMult invalid: value must be between 1 and 4, is {}."sv, *Settings::ScrapHeapMult);
 		return false;
 	}
 
