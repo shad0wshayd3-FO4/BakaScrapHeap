@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.18)
 
 project(
 	BakaScrapHeap
-	VERSION 1.2.0
+	VERSION 1.3.0
 	LANGUAGES CXX
 )
 
@@ -43,9 +43,9 @@ set(MSVC_COMPILE_OPTIONS
 	/Oi	# Generate Intrinsic Functions
 	/sdl	# Enable Additional Security Checks
 	/Zi	# Debug Information Format
-	
+
 	/permissive-	# Standards conformance
-	
+
 	/Zc:alignedNew	# C++17 over-aligned allocation
 	/Zc:auto	# Deduce Variable Type
 	/Zc:char8_t
@@ -67,11 +67,11 @@ set(MSVC_COMPILE_OPTIONS
 	/Zc:tlsGuards
 	/Zc:trigraphs	# Trigraphs Substitution
 	/Zc:wchar_t	# wchar_t Is Native Type
-	
+
 	/experimental:external
 	/external:anglebrackets
 	/external:W0
-	
+
 	/W4	# Warning level (all warnings)
 	/WX	# Warning level (warnings are errors)
 )
@@ -127,6 +127,7 @@ set(Boost_USE_DEBUG_RUNTIME ON)
 add_subdirectory($ENV{CommonLibF4Path} CommonLibF4)
 
 find_package(spdlog REQUIRED CONFIG)
+find_package(fmt REQUIRED CONFIG)
 find_package(tomlplusplus REQUIRED CONFIG)
 
 # ---- Add source files ----
@@ -154,55 +155,55 @@ set(MSVC_TARGET_COMPILE_OPTIONS
 	/TP	# Specify Source File Type (C++)
 )
 
-add_library(BakaScrapHeap SHARED
+add_library(${PROJECT_NAME} SHARED
 	${headers}
 	${sources}
 	${CMAKE_CURRENT_BINARY_DIR}/include/AutoTOML.hpp
 	${CMAKE_CURRENT_BINARY_DIR}/include/version.h
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
 	.clang-format
-	BakaScrapHeap.toml
+	${PROJECT_NAME}.toml
 )
 
 set_property(
 	TARGET
-		BakaScrapHeap
+		${PROJECT_NAME}
 		CommonLibF4
 	PROPERTY
 		MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
-target_compile_features(BakaScrapHeap
+target_compile_features(${PROJECT_NAME}
 	PUBLIC
 		cxx_std_17
 )
 
-target_compile_options(BakaScrapHeap
+target_compile_options(${PROJECT_NAME}
 	PRIVATE
 		"$<$<BOOL:${MSVC}>:${MSVC_TARGET_COMPILE_OPTIONS}>"
 )
 
-target_include_directories(BakaScrapHeap
-	PRIVATE 
+target_include_directories(${PROJECT_NAME}
+	PRIVATE
 		${CMAKE_CURRENT_BINARY_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/include
-		${CMAKE_CURRENT_SOURCE_DIR}/lib
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(BakaScrapHeap
+target_link_libraries(${PROJECT_NAME}
 	PUBLIC
 		CommonLibF4
+		fmt::fmt
 		spdlog::spdlog
 		tomlplusplus::tomlplusplus
 )
 
-target_link_options(BakaScrapHeap
+target_link_options(${PROJECT_NAME}
 	PUBLIC
 		"$<$<AND:$<BOOL:${MSVC}>,$<CONFIG:RELEASE>>:/DEBUG:FULL>"
 )
 
-target_precompile_headers(BakaScrapHeap
+target_precompile_headers(${PROJECT_NAME}
 	PRIVATE
 		src/PCH.h
 )
@@ -210,9 +211,9 @@ target_precompile_headers(BakaScrapHeap
 # ---- Post build ----
 
 add_custom_command(
-	TARGET BakaScrapHeap
+	TARGET ${PROJECT_NAME}
 	POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:BakaScrapHeap> $ENV{Fallout4Path}/Data/F4SE/Plugins/
-	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:BakaScrapHeap> $ENV{Fallout4Path}/Data/F4SE/Plugins/
-	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/BakaScrapHeap.toml $ENV{Fallout4Path}/Data/F4SE/Plugins/
+	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> $ENV{Fallout4Path}/Data/F4SE/Plugins/
+	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:${PROJECT_NAME}> $ENV{Fallout4Path}/Data/F4SE/Plugins/
+	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.toml $ENV{Fallout4Path}/Data/F4SE/Plugins/
 )
