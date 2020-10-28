@@ -1,3 +1,12 @@
+namespace ScrapHeap
+{
+	std::uint32_t MaxMemory{ 0x04000000 };
+	std::uint32_t QMaxMemory()
+	{
+		return MaxMemory;
+	}
+}
+
 extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a_F4SE, F4SE::PluginInfo* a_info)
 {
 	// Create log
@@ -28,7 +37,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	}
 
 	// Initial messages
-	logger::info("{} log opened."sv, "BakaScrapHeap"sv);
+	logger::info("{} log opened."s, "BakaScrapHeap"sv);
 	logger::debug("Debug logging enabled."sv);
 
 	// Initialize PluginInfo
@@ -47,7 +56,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	const auto ver = a_F4SE->RuntimeVersion();
 	if (ver < F4SE::RUNTIME_1_10_163)
 	{
-		logger::critical("Unsupported runtime v{}, marking as incompatible."sv, ver.string());
+		logger::critical("Unsupported runtime v{}, marking as incompatible."s, ver.string());
 		return false;
 	}
 
@@ -58,29 +67,34 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 {
 	// Initialize F4SE
 	F4SE::Init(a_F4SE);
+	F4SE::AllocTrampoline(1 << 4);
 
-	// Patch ScrapHeap
-	static auto GetScrapHeapMaxSize = REL::ID(126418);
+	// Patch ScrapHeap::QMaxMemory
+	REL::Relocation<std::uintptr_t> target{ REL::ID(126418) };
+	auto& trampoline = F4SE::GetTrampoline();
+	trampoline.write_branch<5>(target.address(), ScrapHeap::QMaxMemory);
+
+	// Apply Config
 	switch (*Settings::ScrapHeapMult)
 	{
 	case 1:
-		logger::info("Leaving ScrapHeap unpatched at 0x04000000 (~70mb)."sv);
+		logger::info("ScrapHeap default [0x04000000 (~70mb)]"sv);
 		break;
 	case 2:
-		REL::SafeWriteT(GetScrapHeapMaxSize.address() + 4, static_cast<std::uint8_t>(0x80));
-		logger::info("Patching ScrapHeap to 0x08000000 (~130mb)."sv);
+		logger::info("ScrapHeap patched [0x08000000 (~130mb)]"sv);
+		ScrapHeap::MaxMemory = 0x08000000;
 		break;
 	case 3:
-		REL::SafeWriteT(GetScrapHeapMaxSize.address() + 4, static_cast<std::uint8_t>(0xC0));
-		logger::info("Patching ScrapHeap to 0x0C000000 (~200mb)."sv);
+		logger::info("ScrapHeap patched [0x0C000000 (~200mb)]"sv);
+		ScrapHeap::MaxMemory = 0x0C000000;
 		break;
 	case 4:
-		REL::SafeWriteT(GetScrapHeapMaxSize.address() + 4, static_cast<std::uint8_t>(0xFF));
-		logger::info("Patching ScrapHeap to 0x0FF00000 (~270mb)."sv);
+		logger::info("ScrapHeap patched [0x0FF00000 (~270mb)]"sv);
+		ScrapHeap::MaxMemory = 0x0FF00000;
 		break;
 	default:
-		logger::warn("iScrapHeapMult invalid: value must be between 1 and 4, is {}."sv, *Settings::ScrapHeapMult);
-		return false;
+		logger::warn("ScrapHeapMult invalid: value must be between 1 and 4, is {:d}."s, *Settings::ScrapHeapMult);
+		break;
 	}
 
 	// Finish load
