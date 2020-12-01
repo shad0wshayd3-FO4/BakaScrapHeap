@@ -136,14 +136,16 @@ include(cmake/headerlist.cmake)
 include(cmake/sourcelist.cmake)
 
 source_group(
-	TREE ${CMAKE_CURRENT_SOURCE_DIR}
+	TREE
+		${CMAKE_CURRENT_SOURCE_DIR}
 	FILES
 		${headers}
 		${sources}
 )
 
 source_group(
-	TREE ${CMAKE_CURRENT_BINARY_DIR}
+	TREE
+		${CMAKE_CURRENT_BINARY_DIR}
 	FILES
 		${CMAKE_CURRENT_BINARY_DIR}/include/AutoTOML.hpp
 		${CMAKE_CURRENT_BINARY_DIR}/include/version.h
