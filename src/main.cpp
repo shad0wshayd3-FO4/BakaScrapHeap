@@ -67,12 +67,10 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 {
 	// Initialize F4SE
 	F4SE::Init(a_F4SE);
-	F4SE::AllocTrampoline(1 << 4);
 
 	// Patch ScrapHeap::QMaxMemory
 	REL::Relocation<std::uintptr_t> target{ REL::ID(126418) };
-	auto& trampoline = F4SE::GetTrampoline();
-	trampoline.write_branch<5>(target.address(), ScrapHeap::QMaxMemory);
+	stl::asm_replace(target.address(), 0x10, reinterpret_cast<std::uintptr_t>(ScrapHeap::QMaxMemory));
 
 	// Apply Config
 	switch (*Settings::ScrapHeapMult)
