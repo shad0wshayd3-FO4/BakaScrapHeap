@@ -1,5 +1,6 @@
 #pragma once
 
+#pragma warning(push)
 #include "F4SE/F4SE.h"
 #include "RE/Fallout.h"
 
@@ -7,31 +8,26 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <spdlog/sinks/basic_file_sink.h>
-
-#include "AutoTOML.hpp"
+#include <fmt/format.h>
+#include <AutoTOML.hpp>
+#pragma warning(pop)
 
 #define DLLEXPORT __declspec(dllexport)
 
-namespace logger
-{
-	using namespace F4SE::log;
-}
-
-namespace REL
-{
-	template <typename T>
-	void SafeWriteT(uintptr_t a_addr, const T a_data)
-	{
-		safe_write(a_addr, &a_data, sizeof(T));
-	}
-}
+namespace logger = F4SE::log;
 
 namespace stl
 {
+	using F4SE::stl::emplace_vtable;
 	using F4SE::stl::report_and_fail;
-	using F4SE::stl::span;
+	using F4SE::stl::to_underlying;
+
+#ifdef F4SE_SUPPORT_XBYAK
+	void asm_replace(std::uintptr_t a_from, std::size_t a_size, std::uintptr_t a_to);
+#endif
 }
 
 using namespace std::literals;
