@@ -5,9 +5,10 @@
   "homepage": "https://github.com/shad0wshayd3/BakaScrapHeap",
   "license": "MIT",
   "dependencies": [
-    "boost-atomic",
+    "autotoml",
     "boost-iostreams",
     "boost-iterator",
+    "boost-predef",
     "boost-stl-interfaces",
     "spdlog",
     "tomlplusplus"
