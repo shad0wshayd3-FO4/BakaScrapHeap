@@ -16,7 +16,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 		return false;
 	}
 
-	*logPath /= "BakaScrapHeap.log"sv;
+	*logPath /= fmt::format(FMT_STRING("{}.log"), Version::PROJECT);
 	auto logSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath->string(), true);
 	auto log = std::make_shared<spdlog::logger>("plugin_log"s, std::move(logSink));
 
@@ -27,7 +27,11 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 
 	// Set log level from ini
 	Settings::Load();
+#ifdef NDEBUG
 	if (*Settings::EnableDebugLogging)
+#else
+	if (true)
+#endif
 	{
 		spdlog::set_level(spdlog::level::debug);
 	}
@@ -37,12 +41,12 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	}
 
 	// Initial messages
-	logger::info("{} log opened."s, "BakaScrapHeap"sv);
+	logger::info(FMT_STRING("{} v{} log opened."), Version::PROJECT, Version::NAME);
 	logger::debug("Debug logging enabled."sv);
 
 	// Initialize PluginInfo
 	a_info->infoVersion = F4SE::PluginInfo::kVersion;
-	a_info->name = "BakaScrapHeap";
+	a_info->name = Version::PROJECT.data();
 	a_info->version = Version::MAJOR;
 
 	// Check if we're being loaded in the CK.
@@ -56,7 +60,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	const auto ver = a_F4SE->RuntimeVersion();
 	if (ver < F4SE::RUNTIME_1_10_163)
 	{
-		logger::critical("Unsupported runtime v{}, marking as incompatible."s, ver.string());
+		logger::critical(FMT_STRING("Unsupported runtime v{}, marking as incompatible."), ver.string());
 		return false;
 	}
 
@@ -75,24 +79,24 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 	// Apply Config
 	switch (*Settings::ScrapHeapMult)
 	{
-	case 1:
-		logger::info("ScrapHeap default [0x04000000 (~70mb)]"sv);
-		break;
-	case 2:
-		logger::info("ScrapHeap patched [0x08000000 (~130mb)]"sv);
-		ScrapHeap::MaxMemory = 0x08000000;
-		break;
-	case 3:
-		logger::info("ScrapHeap patched [0x0C000000 (~200mb)]"sv);
-		ScrapHeap::MaxMemory = 0x0C000000;
-		break;
-	case 4:
-		logger::info("ScrapHeap patched [0x0FF00000 (~270mb)]"sv);
-		ScrapHeap::MaxMemory = 0x0FF00000;
-		break;
-	default:
-		logger::warn("ScrapHeapMult invalid: value must be between 1 and 4, is {:d}."s, *Settings::ScrapHeapMult);
-		break;
+		case 1:
+			logger::info("ScrapHeap default [0x04000000 (~70mb)]"sv);
+			break;
+		case 2:
+			logger::info("ScrapHeap patched [0x08000000 (~130mb)]"sv);
+			ScrapHeap::MaxMemory = 0x08000000;
+			break;
+		case 3:
+			logger::info("ScrapHeap patched [0x0C000000 (~200mb)]"sv);
+			ScrapHeap::MaxMemory = 0x0C000000;
+			break;
+		case 4:
+			logger::info("ScrapHeap patched [0x0FF00000 (~270mb)]"sv);
+			ScrapHeap::MaxMemory = 0x0FF00000;
+			break;
+		default:
+			logger::warn(FMT_STRING("ScrapHeapMult invalid: value must be between 1 and 4, is {:d}."), *Settings::ScrapHeapMult);
+			break;
 	}
 
 	// Finish load

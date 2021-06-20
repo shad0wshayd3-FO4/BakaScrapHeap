@@ -10,9 +10,9 @@
 #include <string_view>
 #include <vector>
 
-#include <spdlog/sinks/basic_file_sink.h>
-#include <fmt/format.h>
 #include <AutoTOML.hpp>
+#include <fmt/format.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #pragma warning(pop)
 
 #define DLLEXPORT __declspec(dllexport)

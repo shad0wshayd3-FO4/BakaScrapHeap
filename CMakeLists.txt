@@ -68,10 +68,6 @@ add_compile_definitions(
 )
 
 if (MSVC)
-	add_compile_definitions(
-		_UNICODE
-	)
-
 	if (NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
 		add_compile_options(
 			/MP	# Build with Multiple Processes
@@ -79,15 +75,12 @@ if (MSVC)
 	endif ()
 endif ()
 
-
-# ---- Dependencies ----
-
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
 
-set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_DEBUG_RUNTIME ON)
+
+# ---- Dependencies ----
 
 add_subdirectory("${CommonLibF4Path}" CommonLibF4)
 
@@ -99,22 +92,16 @@ find_package(xbyak REQUIRED CONFIG)
 
 # ---- Add source files ----
 
-include(cmake/headerlist.cmake)
 include(cmake/sourcelist.cmake)
 
 source_group(
-	TREE
-		${CMAKE_CURRENT_SOURCE_DIR}
-	FILES
-		${headers}
-		${sources}
+	TREE ${CMAKE_CURRENT_SOURCE_DIR}
+	FILES ${SOURCES}
 )
 
 source_group(
-	TREE
-		${CMAKE_CURRENT_BINARY_DIR}
-	FILES
-		${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
+	TREE ${CMAKE_CURRENT_BINARY_DIR}
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 )
 
 # ---- Create DLL ----
@@ -122,12 +109,16 @@ source_group(
 add_library(
 	${PROJECT_NAME}
 	SHARED
-	${headers}
-	${sources}
-	${CMAKE_CURRENT_BINARY_DIR}/include/version.h
+	${SOURCES}
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
+	res/settings.toml
 	.clang-format
-	settings.toml
+)
+
+target_compile_definitions(
+	${PROJECT_NAME}
+	PRIVATE
+		_UNICODE
 )
 
 target_compile_features(
@@ -154,11 +145,16 @@ target_link_libraries(
 		xbyak::xbyak
 )
 
+target_precompile_headers(
+	${PROJECT_NAME}
+	PRIVATE
+		src/PCH.h
+)
+
 if (MSVC)
 	target_compile_options(
 		${PROJECT_NAME}
 		PRIVATE
-			/EHa	# Exception handling model
 			/sdl	# Enable Additional Security Checks
 			/utf-8	# Set Source and Executable character sets to UTF-8
 			/Zi	# Debug Information Format
@@ -193,9 +189,6 @@ if (MSVC)
 			/W4	# Warning level
 			/WX	# Warning level (warnings are errors)
 
-			# disable warnings
-			/wd4324 # 'struct_name' : structure was padded due to __declspec(align())
-
 			"$<$<CONFIG:DEBUG>:>"
 			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob3>"
 	)
@@ -210,12 +203,6 @@ if (MSVC)
 	)
 endif ()
 
-target_precompile_headers(
-	${PROJECT_NAME}
-	PRIVATE
-		src/PCH.h
-)
-
 # ---- File copying ----
 
 if (COPY_BUILD)
@@ -225,7 +212,7 @@ if (COPY_BUILD)
 			POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${Fallout4Path}/Data/F4SE/Plugins/
 			COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:${PROJECT_NAME}> ${Fallout4Path}/Data/F4SE/Plugins/
-			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/settings.toml ${Fallout4Path}/Data/F4SE/Plugins/${PROJECT_NAME}.toml
+			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/res/settings.toml ${Fallout4Path}/Data/F4SE/Plugins/${PROJECT_NAME}.toml
 		)
 	else ()
 		message(

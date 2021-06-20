@@ -1,4 +1,0 @@
-[General]
-EnableDebugLogging = false      # Enable Debug message output
-ScrapHeapMult = 2               # ScrapHeap memory multiplier.
-                                # Accepted values are 1 (Vanilla: ~70mb), 2 (Default: ~130mb), 3 (Experimental: ~200mb), 4 (Experimental: ~270mb)
