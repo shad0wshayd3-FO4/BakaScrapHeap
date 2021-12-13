@@ -1,21 +1,19 @@
 #pragma once
 
-#pragma warning(push)
+#pragma warning(push, 0)
 #include "F4SE/F4SE.h"
 #include "RE/Fallout.h"
 
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <string_view>
-#include <vector>
-
 #include <AutoTOML.hpp>
-#include <fmt/format.h>
-#include <spdlog/sinks/basic_file_sink.h>
+
+#ifdef NDEBUG
+#	include <spdlog/sinks/basic_file_sink.h>
+#else
+#	include <spdlog/sinks/msvc_sink.h>
+#endif
 #pragma warning(pop)
 
-#define DLLEXPORT __declspec(dllexport)
+using namespace std::literals;
 
 namespace logger = F4SE::log;
 
@@ -30,8 +28,8 @@ namespace stl
 #endif
 }
 
-using namespace std::literals;
-
-#include "version.h"
+#include "Plugin.h"
 
 #include "Settings.h"
+
+#define DLLEXPORT __declspec(dllexport)
