@@ -5,7 +5,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": {
           "type": "STRING",
-          "value": "Debug"
+          "value": "Release"
         }
       },
       "errors": {
@@ -22,15 +22,11 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": {
           "type": "STRING",
-          "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
         },
         "VCPKG_OVERLAY_PORTS": {
           "type": "STRING",
-          "value": "${sourceDir}/cmake/ports/;${sourceDir}/external/CommonLibF4/cmake/ports/"
-        },
-        "VCPKG_OVERLAY_TRIPLETS": {
-          "type": "STRING",
-          "value": "${sourceDir}/cmake/triplets/"
+          "value": "${sourceDir}/cmake/ports/;${sourceDir}/extern/CommonLibF4/cmake/ports/"
         }
       },
       "hidden": true,
@@ -38,17 +34,13 @@
     },
     {
       "cacheVariables": {
-        "Boost_USE_STATIC_RUNTIME": {
-          "type": "BOOL",
-          "value": "OFF"
-        },
         "CMAKE_MSVC_RUNTIME_LIBRARY": {
           "type": "STRING",
-          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
-          "value": "x64-windows-baka"
+          "value": "x64-windows-static"
         }
       },
       "hidden": true,
@@ -56,7 +48,8 @@
     },
     {
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX"
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX",
+        "CMAKE_CXX_FLAGS_RELEASE": "/O2 /DNDEBUG"
       },
       "generator": "Visual Studio 17 2022",
       "inherits": [

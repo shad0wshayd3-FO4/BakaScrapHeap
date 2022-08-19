@@ -1,6 +1,6 @@
 {
   "name": "bakascrapheap",
-  "version-string": "2.1.0",
+  "version-string": "2.2.0",
   "description": "F4SE plugin to increase Fallout 4's default ScrapHeap memory allocation using CommonLibF4.",
   "homepage": "https://github.com/shad0wshayd3/BakaScrapHeap",
   "license": "MIT",
