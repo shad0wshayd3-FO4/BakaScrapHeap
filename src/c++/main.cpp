@@ -36,26 +36,7 @@ namespace ScrapHeap
 	}
 }
 
-extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a_F4SE, F4SE::PluginInfo* a_info)
-{
-	a_info->infoVersion = F4SE::PluginInfo::kVersion;
-	a_info->name = Version::PROJECT.data();
-	a_info->version = Version::MAJOR;
-
-	const auto rtv = a_F4SE->RuntimeVersion();
-	if (rtv < F4SE::RUNTIME_LATEST)
-	{
-		stl::report_and_fail(
-			fmt::format(
-				FMT_STRING("{:s} does not support runtime v{:s}."sv),
-				Version::PROJECT,
-				rtv.string()));
-	}
-
-	return true;
-}
-
-extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F4SE)
+DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F4SE)
 {
 	Settings::Load();
 	InitializeLog();
@@ -65,7 +46,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 
 	F4SE::Init(a_F4SE);
 
-	REL::Relocation<std::uintptr_t> target{ REL::ID(126418) };
+	REL::Relocation<std::uintptr_t> target{ REL::ID(2228361) };
 	stl::asm_replace(target.address(), 0x10, reinterpret_cast<std::uintptr_t>(ScrapHeap::QMaxMemory));
 
 	switch (*Settings::General::ScrapHeapMult)
