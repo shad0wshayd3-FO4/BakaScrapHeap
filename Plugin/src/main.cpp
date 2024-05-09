@@ -59,7 +59,8 @@ public:
 		static REL::Relocation<std::uintptr_t> target{ REL::ID(2228361) };
 		stl::asm_replace(target.address(), 0x10, reinterpret_cast<std::uintptr_t>(QMaxMemory));
 
-		switch (*Config::General::iScrapHeapMult) {
+		switch (*Config::General::iScrapHeapMult)
+		{
 		case 1:
 			INFO("ScrapHeap default [0x04000000 (~70mb)]"sv);
 			break;

@@ -120,7 +120,8 @@ using namespace std::literals;
 #include "DKUtil/Logger.hpp"
 
 // F4SEPlugin_Version
-DLLEXPORT constinit auto F4SEPlugin_Version = []() noexcept {
+DLLEXPORT constinit auto F4SEPlugin_Version = []() noexcept
+{
 	F4SE::PluginVersionData data{};
 
 	data.PluginVersion(Plugin::Version);
