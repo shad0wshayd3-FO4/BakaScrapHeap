@@ -1,21 +1,14 @@
 {
-  "name": "bakascrapheap",
-  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-  "dependencies": [
-    "boost-stl-interfaces",
-    "fmt",
-    "nlohmann-json",
-    "rsm-mmio",
-    "simpleini",
-    "spdlog",
-    "tomlplusplus",
-    "xbyak"
-  ],
-  "builtin-baseline": "a42af01b72c28a8e1d7b48107b33e4f286a55ef6",
-  "overrides": [
-      {
-          "name": "tomlplusplus",
-          "version": "3.1.0"
-      }
-  ]
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "name": "bakascrapheap",
+    "homepage": "https://github.com/shad0wshayd3-FO4/BakaScrapHeap",
+    "dependencies": [
+        "boost-stl-interfaces",
+        "nlohmann-json",
+        "rsm-mmio",
+        "simpleini",
+        "spdlog",
+        "tomlplusplus",
+        "xbyak"
+    ]
 }
