@@ -3,7 +3,6 @@
     "name": "bakascrapheap",
     "homepage": "https://github.com/shad0wshayd3-FO4/BakaScrapHeap",
     "dependencies": [
-        "boost-stl-interfaces",
         "nlohmann-json",
         "rsm-mmio",
         "simpleini",
