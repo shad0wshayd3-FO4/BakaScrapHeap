@@ -17,6 +17,7 @@ namespace Config
 namespace ScrapHeap
 {
 	static std::uint32_t MaxMemory{ 0x04000000u };
+
 	static std::uint32_t QMaxMemory()
 	{
 		return MaxMemory;
