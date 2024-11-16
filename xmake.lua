@@ -24,7 +24,6 @@ add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
 -- add options
-set_config("f4se_xbyak", true)
 set_config("rex_ini", true)
 
 -- setup targets
