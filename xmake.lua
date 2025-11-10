@@ -6,7 +6,7 @@ includes("lib/commonlibf4")
 
 -- set project
 set_project("BakaScrapHeap")
-set_version("3.0.0")
+set_version("4.0.0")
 set_license("GPL-3.0")
 
 -- set defaults
@@ -22,7 +22,7 @@ add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
 -- set config
-set_config("rex_ini", true)
+set_config("commonlib_ini", true)
 
 -- targets
 target("BakaScrapHeap")
