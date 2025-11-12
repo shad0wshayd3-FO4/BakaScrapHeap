@@ -6,7 +6,7 @@ includes("lib/commonlibf4")
 
 -- set project
 set_project("BakaScrapHeap")
-set_version("4.0.0")
+set_version("3.0.0")
 set_license("GPL-3.0")
 
 -- set defaults
@@ -14,7 +14,6 @@ set_languages("c++23")
 set_warnings("allextra")
 
 -- set policies
-set_policy("build.optimization.lto", true)
 set_policy("package.requires_lock", true)
 
 -- add rules

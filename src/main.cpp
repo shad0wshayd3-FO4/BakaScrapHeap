@@ -14,68 +14,60 @@ namespace Config
 	}
 }
 
-namespace ScrapHeap
+namespace Hook
 {
-	static std::uint32_t MaxMemory{ 0x04000000u };
-
-	static std::uint32_t QMaxMemory()
+	class hkMaxMemory :
+		public REX::Singleton<hkMaxMemory>
 	{
-		return MaxMemory;
-	}
+	private:
+		static std::uint32_t QMaxMemory()
+		{
+			return MaxMemory;
+		}
 
-	static void Install()
+		inline static REL::Hook _QMaxMemory0{ REL::Offset(0x0C2A450), 0x056, QMaxMemory };
+		inline static REL::Hook _QMaxMemory1{ REL::Offset(0x0C2A450), 0x0A2, QMaxMemory };
+		inline static REL::Hook _QMaxMemory2{ REL::Offset(0x16518C0), 0x057, QMaxMemory };
+		inline static REL::Hook _QMaxMemory3{ REL::Offset(0x17DB430), 0x1AA, QMaxMemory };
+		inline static REL::Hook _QMaxMemory4{ REL::Offset(0x17DB430), 0x1EC, QMaxMemory };
+		inline static REL::Hook _QMaxMemory5{ REL::Offset(0x17DC7D0), 0x1AA, QMaxMemory };
+		inline static REL::Hook _QMaxMemory6{ REL::Offset(0x17DC7D0), 0x1EC, QMaxMemory };
+
+	public:
+		inline static std::uint32_t MaxMemory{ 0x04000000u };
+	};
+
+	static void Init()
 	{
-		static REL::Relocation target{ REL::ID(2228361) };
-		target.replace_func(0x10, QMaxMemory);
+		Config::Load();
 
-		auto iScrapHeapMult = Config::General::iScrapHeapMult.GetValue();
-		switch (iScrapHeapMult)
+		switch (Config::General::iScrapHeapMult)
 		{
 		case 1:
-			F4SE::log::info("ScrapHeap default [0x04000000 (~70mb)]"sv);
+			REX::INFO("ScrapHeap set to 0x04000000 (~070mb)"sv);
 			break;
 		case 2:
-			F4SE::log::info("ScrapHeap patched [0x08000000 (~130mb)]"sv);
-			MaxMemory = 0x08000000u;
+			REX::INFO("ScrapHeap set to 0x08000000 (~130mb)"sv);
+			hkMaxMemory::MaxMemory = 0x08000000u;
 			break;
 		case 3:
-			F4SE::log::info("ScrapHeap patched [0x0C000000 (~200mb)]"sv);
-			MaxMemory = 0x0C000000u;
+			REX::INFO("ScrapHeap set to 0x0C000000 (~200mb)"sv);
+			hkMaxMemory::MaxMemory = 0x0C000000u;
 			break;
 		case 4:
-			F4SE::log::info("ScrapHeap patched [0x0FF00000 (~270mb)]"sv);
-			MaxMemory = 0x0FF00000u;
+			REX::INFO("ScrapHeap set to 0x0FF00000 (~270mb)"sv);
+			hkMaxMemory::MaxMemory = 0x0FF00000u;
 			break;
 		default:
-			F4SE::log::info("ScrapHeapMult invalid: value must be between 1 and 4, is {:d}."sv, iScrapHeapMult);
+			REX::WARN("iScrapHeapMult invalid: value must be between 1 and 4."sv);
 			break;
 		}
 	}
 }
 
-namespace
+F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_F4SE)
 {
-	void MessageCallback(F4SE::MessagingInterface::Message* a_msg) noexcept
-	{
-		switch (a_msg->type)
-		{
-		case F4SE::MessagingInterface::kPostLoad:
-		{
-			ScrapHeap::Install();
-			break;
-		}
-		default:
-			break;
-		}
-	}
-}
-
-F4SEPluginLoad(const F4SE::LoadInterface* a_F4SE)
-{
-	F4SE::Init(a_F4SE);
-	F4SE::GetMessagingInterface()->RegisterListener(MessageCallback);
-
-	Config::Load();
-
+	F4SE::Init(a_F4SE, { .trampoline = true });
+	Hook::Init();
 	return true;
 }
