@@ -25,13 +25,13 @@ namespace Hook
 			return MaxMemory;
 		}
 
-		inline static REL::Hook _QMaxMemory0{ REL::Offset(0x0C2A450), 0x056, QMaxMemory };
-		inline static REL::Hook _QMaxMemory1{ REL::Offset(0x0C2A450), 0x0A2, QMaxMemory };
-		inline static REL::Hook _QMaxMemory2{ REL::Offset(0x16518C0), 0x057, QMaxMemory };
-		inline static REL::Hook _QMaxMemory3{ REL::Offset(0x17DB430), 0x1AA, QMaxMemory };
-		inline static REL::Hook _QMaxMemory4{ REL::Offset(0x17DB430), 0x1EC, QMaxMemory };
-		inline static REL::Hook _QMaxMemory5{ REL::Offset(0x17DC7D0), 0x1AA, QMaxMemory };
-		inline static REL::Hook _QMaxMemory6{ REL::Offset(0x17DC7D0), 0x1EC, QMaxMemory };
+		inline static REL::Hook _QMaxMemory0{ REL::ID(2228905), 0x056, QMaxMemory };
+		inline static REL::Hook _QMaxMemory1{ REL::ID(2228905), 0x0A2, QMaxMemory };
+		inline static REL::Hook _QMaxMemory2{ REL::ID(2267850), 0x057, QMaxMemory };
+		inline static REL::Hook _QMaxMemory3{ REL::ID(2275922), 0x1AA, QMaxMemory };
+		inline static REL::Hook _QMaxMemory4{ REL::ID(2275922), 0x1EC, QMaxMemory };
+		inline static REL::Hook _QMaxMemory5{ REL::ID(2275943), 0x1AA, QMaxMemory };
+		inline static REL::Hook _QMaxMemory6{ REL::ID(2275943), 0x1EC, QMaxMemory };
 
 	public:
 		inline static std::uint32_t MaxMemory{ 0x04000000u };
@@ -67,7 +67,7 @@ namespace Hook
 
 F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_F4SE)
 {
-	F4SE::Init(a_F4SE, { .trampoline = true });
+	F4SE::Init(a_F4SE, { .trampoline = true, .trampolineSize = 14 });
 	Hook::Init();
 	return true;
 }
