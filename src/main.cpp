@@ -14,7 +14,7 @@ namespace Config
 	}
 }
 
-namespace Hook
+namespace Hooks
 {
 	class hkMaxMemory :
 		public REX::Singleton<hkMaxMemory>
@@ -37,7 +37,7 @@ namespace Hook
 		inline static std::uint32_t MaxMemory{ 0x04000000u };
 	};
 
-	static void Init()
+	static void Install()
 	{
 		Config::Load();
 
@@ -65,9 +65,24 @@ namespace Hook
 	}
 }
 
-F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_F4SE)
+namespace
 {
-	F4SE::Init(a_F4SE, { .trampoline = true, .trampolineSize = 14 });
-	Hook::Init();
+	void MessageCallback(F4SE::MessagingInterface::Message* a_msg)
+	{
+		switch (a_msg->type)
+		{
+		case F4SE::MessagingInterface::kPostLoad:
+			Hooks::Install();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
+{
+	F4SE::Init(a_f4se, { .trampoline = true, .trampolineSize = 14 });
+	F4SE::GetMessagingInterface()->RegisterListener(MessageCallback);
 	return true;
 }
